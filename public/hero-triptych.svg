@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#071018" />
+      <stop offset="60%" stop-color="#091f1b" />
+      <stop offset="100%" stop-color="#041015" />
+    </linearGradient>
+
+    <radialGradient id="emeraldGlow" cx="50%" cy="80%" r="60%">
+      <!-- Subtler glow: reduced opacities -->
+      <stop offset="0%" stop-color="#0ff0a0" stop-opacity="0.09" />
+      <stop offset="45%" stop-color="#0bb07a" stop-opacity="0.06" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </radialGradient>
+
+    <linearGradient id="tealCloud" x1="0" x2="1">
+      <stop offset="0%" stop-color="#0e4b45" stop-opacity="0.20" />
+      <stop offset="100%" stop-color="#062826" stop-opacity="0.12" />
+    </linearGradient>
+
+    <filter id="grain">
+      <feTurbulence baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" />
+      <feColorMatrix type="saturate" values="0" />
+      <feBlend mode="overlay" />
+    </filter>
+
+    <g id="silhouette">
+      <!-- Generic minimal worker silhouette (no facial details) -->
+      <path d="M0 0 L0 220 L40 240 L40 360 L0 400 L0 520 L120 520 L120 400 L80 360 L80 240 L120 220 L120 0 Z" fill="#0b1b1a" />
+    </g>
+  </defs>
+
+  <!-- Base background -->
+  <rect width="100%" height="100%" fill="url(#bg)" />
+
+  <!-- Soft teal cloud layers -->
+  <g transform="translate(0,220)">
+    <path d="M0 320 C220 220 360 420 580 360 C800 300 950 420 1080 360 L1080 1080 L0 1080 Z" fill="url(#tealCloud)" opacity="0.12" />
+    <path d="M0 160 C180 80 420 220 660 160 C900 100 1000 240 1080 200 L1080 0 L0 0 Z" fill="#063b35" opacity="0.07" />
+  </g>
+
+  <!-- Stronger emerald glow from below (emphasized) -->
+  <!-- Softer emerald glow (reduced opacity) -->
+  <rect x="0" y="1000" width="1080" height="920" fill="url(#emeraldGlow)" opacity="0.35" />
+
+  <!-- Subtle network lines + nodes -->
+  <g stroke="#0af08a" stroke-opacity="0.03" stroke-width="1.2" fill="none">
+    <path d="M40 600 L260 520 L380 640 L540 580 L760 700 L980 620" />
+    <circle cx="260" cy="520" r="3.5" fill="#0af08a" stroke="none" />
+    <circle cx="380" cy="640" r="3" fill="#0af08a" />
+    <path d="M120 820 L320 760 L420 880 L620 820" stroke-opacity="0.02" />
+    <circle cx="420" cy="880" r="2.5" fill="#9ef4c9" />
+  </g>
+
+  <!-- Misty mid-ground cloud shapes for depth -->
+  <g fill="#082a25" opacity="0.10">
+    <path d="M0 1180 C220 1120 420 1260 680 1180 C920 1100 1080 1240 1080 1240 L1080 1500 L0 1500 Z" />
+    <path d="M0 980 C180 920 420 1040 700 980 C960 920 1080 1040 1080 1040 L1080 1180 L0 1180 Z" opacity="0.06" />
+  </g>
+
+  <!-- Foreground silhouettes (minimal, blended into mist) - more figures, softer edges -->
+  <g transform="translate(120,1240) scale(1.9)" opacity="0.94">
+    <g transform="translate(40,0) scale(1)">
+      <use href="#silhouette" transform="translate(0,0) scale(0.6)" />
+      <path d="M46 70 L78 70 L68 120 L56 120 Z" fill="#0a1b1a" opacity="0.6" />
+    </g>
+    <g transform="translate(260,10) scale(1)">
+      <use href="#silhouette" transform="translate(0,0) scale(0.9)" />
+    </g>
+    <g transform="translate(140,6) scale(0.85)" opacity="0.9">
+      <use href="#silhouette" transform="translate(0,0) scale(0.8)" />
+    </g>
+    <g transform="translate(420,12) scale(0.95)" opacity="0.88">
+      <use href="#silhouette" transform="translate(0,0) scale(0.7)" />
+    </g>
+    <g transform="translate(520,0) scale(1)">
+      <use href="#silhouette" transform="translate(0,0) scale(0.8)" />
+    </g>
+    <g transform="translate(780,6) scale(1)">
+      <use href="#silhouette" transform="translate(0,0) scale(0.7)" />
+    </g>
+  </g>
+
+  <!-- Grain overlay for premium texture (subtle) -->
+  <!-- Reduced grain for a subtler texture -->
+  <rect width="100%" height="100%" fill="transparent" filter="url(#grain)" opacity="0.02" />
+
+</svg>

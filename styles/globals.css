@@ -1,0 +1,11 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@layer base {
+  * { @apply border-border outline-ring/50; }
+  /* Keep styles minimal here — remove any hero/background art so app-level styles are authoritative. */
+  /* Leave body background to `app/globals.css` so the hero image is applied globally. */
+  body { @apply text-foreground; background: none; }
+}
+
+@keyframes float { 0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)} }
