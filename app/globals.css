@@ -1,0 +1,192 @@
+@import "tailwindcss";
+:root {
+  /* Dark theme defaults - natural dark appearance */
+    /* Use a transparent background variable so the site-wide image shows through.
+      Place the triptych image at `public/hero-triptych.jpg` (see README below).
+      The `body` rule below applies the image for all pages. */
+    --background: transparent;
+  --foreground: #e6eef6; /* soft light text */
+
+    /* Make panels slightly translucent so the site hero shows through.
+      Keep foreground text the same for contrast. Adjust alpha as needed. */
+    --card: rgba(15,23,32,0.66); /* translucent panel for content */
+    --card-foreground: #e6eef6;
+
+    --popover: rgba(15,23,32,0.6); /* translucent popovers */
+    --popover-foreground: #e6eef6;
+
+  /* Primary: deep organic green for growth */
+  --primary: #2f855a;
+  --primary-foreground: #ffffff;
+
+  /* Secondary: warm amber for trust */
+  --secondary: #b87b2a;
+  --secondary-foreground: #ffffff;
+
+  /* Muted: soft neutrals for UI elements */
+  --muted: #111216;
+  --muted-foreground: #bfc9d6;
+
+  /* Accent: sky blue for connectivity */
+  --accent: #4fb3ff;
+  --accent-foreground: #04263b;
+
+  --destructive: #b23a3a;
+  --destructive-foreground: #ffffff;
+
+  --border: #1a1f24;
+  --input: #0d1116;
+  --ring: #2f855a;
+
+  --chart-1: #2f855a;
+  --chart-2: #b87b2a;
+  --chart-3: #4fb3ff;
+  --chart-4: #6b9a4b;
+  --chart-5: #5aa1b8;
+
+  --radius: 0.625rem;
+
+  --sidebar: rgba(15,23,32,0.72);
+  --sidebar-foreground: #e6eef6;
+  --sidebar-primary: #2f855a;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #b87b2a;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #1a1f24;
+  --sidebar-ring: #2f855a;
+}
+ 
+
+@theme inline {
+  --font-sans: "Geist", "Geist Fallback";
+  --font-mono: "Geist Mono", "Geist Mono Fallback";
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  /* Site-wide hero background (triptych).
+     - Put the image file at `public/hero-triptych.jpg`.
+     - The image will cover the viewport and remain fixed while content scrolls.
+     - `bg-background` still maps to a transparent color so components using that
+       token don't paint an opaque backdrop over the hero. */
+  body {
+    @apply text-foreground;
+    background-color: transparent;
+     /* Pale-green tint overlay above the hero to give an overall pale-green tone.
+       The first background layer is the translucent pale-green gradient (top layer).
+       Then the hero SVG/JPG are underneath, followed by a pale-green fallback gradient. */
+     background-image: linear-gradient(rgba(222,255,232,0.20), rgba(222,255,232,0.08)), url('/hero-triptych.svg'), url('/hero-triptych.jpg'), linear-gradient(180deg, #e6fff0 0%, #dff9ec 100%);
+     background-size: cover, cover, cover, cover;
+     background-position: center center, center center, center center, center center;
+     background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
+     background-attachment: fixed, fixed, fixed, fixed;
+    /* Ensure content stacks above the image */
+    min-height: 100vh;
+  }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Force common opaque utility backgrounds to be translucent so the hero shows through.
+   These selectors intentionally use attribute matching to cover Tailwind's generated
+   classes such as `bg-white/10`, `bg-foreground`, `bg-foreground/80`, etc.
+   Adjust the alpha values if you want stronger or subtler translucency. */
+[class*="bg-white"] {
+  background-color: rgba(255,255,255,0.04) !important;
+  backdrop-filter: blur(6px) !important;
+}
+[class*="bg-foreground"] {
+  background-color: rgba(230,238,246,0.04) !important;
+  color: var(--foreground) !important;
+  backdrop-filter: blur(6px) !important;
+}
+[class*="bg-foreground/"] {
+  background-color: rgba(230,238,246,0.04) !important;
+  backdrop-filter: blur(6px) !important;
+}
+[class*="bg-card"] {
+  /* keep card translucent but ensure it's slightly darker for contrast */
+  background-color: rgba(15,23,32,0.6) !important;
+  backdrop-filter: blur(6px) !important;
+}
+
+/* Additional common background utilities to make less-opaque */
+[class*="bg-muted"] {
+  background-color: rgba(17,18,22,0.28) !important;
+  backdrop-filter: blur(6px) !important;
+}
+[class*="bg-white/"] {
+  background-color: rgba(255,255,255,0.04) !important;
+  backdrop-filter: blur(6px) !important;
+}
+
+/* Exempt the site footer so it remains a solid white card for legibility.
+   Many components intentionally get translucency above, but the footer
+   (site final section) should be a readable white card with dark text. */
+/* Footer: make it a pale trust-building green and ensure dark green text for readability */
+footer[class*="bg-white"], footer.bg-white {
+  background-color: #e6fff0 !important; /* very pale green */
+  color: #064e3b !important; /* dark green text for contrast */
+  border-top: 1px solid rgba(6,78,59,0.06) !important;
+}
+footer[class*="bg-white"] a,
+footer[class*="bg-white"] p,
+footer[class*="bg-white"] h1,
+footer[class*="bg-white"] h2,
+footer[class*="bg-white"] h3,
+footer[class*="bg-white"] li {
+  color: #064e3b !important;
+}
+footer[class*="bg-white"] .text-card\/70 {
+  color: rgba(6,78,59,0.72) !important; /* slightly muted dark-green for secondary text */
+}
+
+

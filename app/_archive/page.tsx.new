@@ -1,0 +1,240 @@
+"use client"
+
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+import { LogOut, MapPin, Bell, User, Plus, Pencil } from "lucide-react"
+import { supabase } from "@/lib/supabaseClient"
+import { Input } from "@/components/ui/input"
+
+// ... (keep all the interfaces as they are)
+
+export default function WorkerDashboard() {
+  // ... (keep all the state declarations and other functions as they are, just update the render part)
+
+  return (
+    <div className="min-h-screen">
+      {/* Header */}
+      <div className="border-b border-border bg-card/50 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">
+              Welcome back, {profile?.full_name || "Worker"}
+            </h1>
+            <p className="text-muted-foreground text-sm">
+              Manage your services and monitor bookings
+            </p>
+          </div>
+          <Button variant="outline" onClick={handleLogout} className="flex items-center gap-2 bg-transparent">
+            <LogOut className="w-4 h-4" />
+            Logout
+          </Button>
+        </div>
+      </div>
+
+      {/* Service Status Controls */}
+      <div className="border-b border-border bg-card/50 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold">My Services Status</h2>
+            <Link href="/services/offer">
+              <Button className="bg-primary hover:bg-primary/90">
+                <Plus className="w-4 h-4 mr-2" />
+                Add New Service
+              </Button>
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {workerServices?.map((service) => (
+              <Card key={service.id} className="p-4 bg-card/50">
+                <div className="flex flex-col space-y-4">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-medium text-lg">{service.name}</h3>
+                      <p className="text-sm text-muted-foreground">
+                        KES {service.price.toLocaleString()} • {service.duration}
+                      </p>
+                      {service.location && (
+                        <p className="text-sm text-muted-foreground flex items-center mt-1">
+                          <MapPin className="w-4 h-4 mr-1" />
+                          {service.location}
+                        </p>
+                      )}
+                    </div>
+                    <span className={`px-2 py-1 text-xs rounded-full ${
+                      service.status === 'open' 
+                        ? 'bg-green-500/20 text-green-400'
+                        : 'bg-red-500/20 text-red-400'
+                    }`}>
+                      {service.status?.toUpperCase() || 'PENDING'}
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => handleToggleServiceStatus(service.id, service.status === 'closed')}
+                      variant={service.status === 'open' ? 'destructive' : 'default'}
+                      className="flex-1"
+                    >
+                      {service.status === 'open' ? 'Close Service' : 'Open Service'}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => router.push(`/services/offer?edit=${service.id}`)}
+                      className="px-3"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid md:grid-cols-3 gap-8">
+          {/* Main Content */}
+          <div className="md:col-span-2 space-y-8">
+            {/* Recent Activity Section */}
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-white">Recent Activity</h2>
+                <div className="flex gap-2">
+                  <Button variant="outline" className="bg-white/10 text-white border-white/20">
+                    Pending Services ({workerServices.filter(s => s.status === 'pending').length})
+                  </Button>
+                  <Button variant="outline" className="bg-white/10 text-white border-white/20">
+                    New Bookings ({recentClientBookings.filter(b => b.status === 'pending').length})
+                  </Button>
+                </div>
+              </div>
+
+              {/* Pending Services Approval */}
+              {workerServices.some(s => s.status === 'pending') && (
+                <div className="mb-8">
+                  <h3 className="text-lg font-semibold text-white mb-4">Services Pending Approval</h3>
+                  <div className="space-y-4">
+                    {workerServices
+                      .filter(service => service.status === 'pending')
+                      .map((service) => (
+                        <Card key={service.id} className="p-4 bg-card/50">
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <h4 className="font-medium">{service.name}</h4>
+                              <p className="text-sm text-muted-foreground">
+                                KES {service.price.toLocaleString()} • {service.duration}
+                              </p>
+                            </div>
+                            <Button
+                              onClick={() => handleApproveService(service.id)}
+                              className="bg-green-600 hover:bg-green-700"
+                            >
+                              Approve Service
+                            </Button>
+                          </div>
+                        </Card>
+                      ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Recent Client Bookings */}
+              <div>
+                <h3 className="text-lg font-semibold text-white mb-4">Recent Client Bookings</h3>
+                <div className="space-y-4">
+                  {recentClientBookings.length === 0 ? (
+                    <Card className="p-6 text-center bg-card/50">
+                      <p className="text-muted-foreground">No recent bookings to display</p>
+                    </Card>
+                  ) : (
+                    recentClientBookings.map((booking) => (
+                      <Card key={booking.id} className="p-4 bg-card/50">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
+                            {booking.profiles?.avatar_url ? (
+                              <img
+                                src={booking.profiles.avatar_url}
+                                alt={booking.profiles.full_name}
+                                className="w-full h-full rounded-full object-cover"
+                              />
+                            ) : (
+                              <span className="text-lg text-primary">
+                                {booking.profiles?.full_name?.[0] || '?'}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <h3 className="font-medium text-foreground">
+                                  {booking.profiles?.full_name || 'Unknown Client'}
+                                </h3>
+                                <p className="text-sm text-muted-foreground">
+                                  {new Date(booking.created_at).toLocaleString()}
+                                </p>
+                              </div>
+                              <span className={`px-2 py-1 text-xs rounded-full ${
+                                booking.status === 'approved' 
+                                  ? 'bg-green-500/20 text-green-400'
+                                  : booking.status === 'pending'
+                                  ? 'bg-yellow-500/20 text-yellow-400'
+                                  : 'bg-red-500/20 text-red-400'
+                              }`}>
+                                {booking.status.toUpperCase()}
+                              </span>
+                            </div>
+                            <div className="mt-3 space-y-2">
+                              <div className="flex justify-between text-sm">
+                                <span className="text-muted-foreground">Service:</span>
+                                <span className="font-medium">{booking.services?.name || 'Unknown Service'}</span>
+                              </div>
+                              <div className="flex justify-between text-sm">
+                                <span className="text-muted-foreground">Price:</span>
+                                <span>KES {booking.services?.price?.toLocaleString() || '0'}</span>
+                              </div>
+                              <div className="flex justify-between text-sm">
+                                <span className="text-muted-foreground">Date:</span>
+                                <span>{new Date(booking.booking_date).toLocaleDateString()}</span>
+                              </div>
+                            </div>
+                            {booking.status === 'pending' && (
+                              <Button
+                                onClick={() => handleApproveBooking(booking.id)}
+                                className="w-full mt-3 bg-green-600 hover:bg-green-700"
+                              >
+                                Approve Booking
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </Card>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Available Jobs section (keep as is) */}
+            
+            {/* My job_applications section (keep as is) */}
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-4">
+            {/* Profile Card (keep as is) */}
+            
+            {/* My Services Card (keep as is) */}
+            
+            {/* Quick Stats Card (keep as is) */}
+            
+            {/* Notifications Card (keep as is) */}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
